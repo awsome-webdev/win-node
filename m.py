@@ -277,6 +277,7 @@ HTML_TEMPLATE = """
     };
 
     // Check status periodically
+    startWorker();
     setInterval(checkStatus, 3000);
     checkStatus();
   </script>

@@ -190,4 +190,24 @@ echo Target Script : %TARGET_DIR%\m.py
 echo Output Log    : %TARGET_DIR%\service_out.log
 echo Error Log     : %TARGET_DIR%\service_err.log
 echo ============================================================================
+start "" chrome --app="http://localhost:5000"
+
+set "SHORTCUT_PATH=%USERPROFILE%\Desktop\Win-Node Dashboard.lnk"
+set "TARGET_URL=http://localhost:5000"
+
+powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+  "$ws = New-Object -ComObject WScript.Shell; " ^
+  "$s = $ws.CreateShortcut('%SHORTCUT_PATH%'); " ^
+  "$chrome = (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe' -ErrorAction SilentlyContinue).'(default)'; " ^
+  "if (-not $chrome) { $chrome = (Get-ItemProperty 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe' -ErrorAction SilentlyContinue).'(default)' }; " ^
+  "if ($chrome) { " ^
+  "  $s.TargetPath = $chrome; " ^
+  "  $s.Arguments = '--app=%TARGET_URL%'; " ^
+  "  $s.IconLocation = '$chrome,0'; " ^
+  "} else { " ^
+  "  $s.TargetPath = '%TARGET_URL%'; " ^
+  "} " ^
+  "$s.Description = 'Open Win-Node Controller'; " ^
+  "$s.Save()"
+
 pause
