@@ -9,6 +9,7 @@ import json
 import urllib.request
 import urllib.error
 import psutil
+from sysstats import get_system_stats, prime_cpu_samplers
 from datetime import datetime
 
 # Default Configurations
@@ -301,7 +302,8 @@ def send_heartbeat():
         "total_timeouts": node_timeouts,
         "total_restarts": node_restarts,
         "workers": worker_list,
-        "logs": outgoing_logs
+        "logs": outgoing_logs,
+        "system" : get_system_stats()
     }
 
     url = f"{MASTER_URL.rstrip('/')}/api/node/heartbeat"
@@ -367,16 +369,15 @@ def setup_interactive_config():
     print("=================================================")
 
     try:
-        #url_input = input(f"Enter Master Dashboard Domain/URL [default: {MASTER_URL}]: ").strip()
-        url_input = "https://cap.awdv.dev"
+        url_input = input(f"Enter Master Dashboard Domain/URL [default: {MASTER_URL}]: ").strip()
         if url_input:
             if not url_input.startswith("http://") and not url_input.startswith("https://"):
                 url_input = f"https://{url_input}"
             MASTER_URL = url_input.rstrip("/")
 
-        #key_input = input(f"Enter Secret Key [default: {SECRET_KEY}]: ").strip()
-        #if key_input:
-        #    SECRET_KEY = key_input
+        key_input = input(f"Enter Secret Key [default: {SECRET_KEY}]: ").strip()
+        if key_input:
+            SECRET_KEY = key_input
     except (KeyboardInterrupt, EOFError):
         pass
 
@@ -384,6 +385,9 @@ def main():
     setup_interactive_config()
     log_system(f"Connecting Node to Master Control Center at {MASTER_URL}...")
 
+    # Prime psutil CPU samplers so the first heartbeat doesn't report 0.0% CPU
+    prime_cpu_samplers()
+    
     # Start Git background thread
     git_thread = threading.Thread(target=git_update_worker, daemon=True)
     git_thread.start()
