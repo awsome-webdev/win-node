@@ -369,15 +369,12 @@ def setup_interactive_config():
     print("=================================================")
 
     try:
-        url_input = input(f"Enter Master Dashboard Domain/URL [default: {MASTER_URL}]: ").strip()
+        #url_input = input(f"Enter Master Dashboard Domain/URL [default: {MASTER_URL}]: ").strip()
+        url_input = "https://cap.awdv.dev"
         if url_input:
             if not url_input.startswith("http://") and not url_input.startswith("https://"):
                 url_input = f"https://{url_input}"
             MASTER_URL = url_input.rstrip("/")
-
-        key_input = input(f"Enter Secret Key [default: {SECRET_KEY}]: ").strip()
-        if key_input:
-            SECRET_KEY = key_input
     except (KeyboardInterrupt, EOFError):
         pass
 
